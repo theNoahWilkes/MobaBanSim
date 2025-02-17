@@ -25,10 +25,10 @@ class Overwatch(Game):
     def __init__(self):
         characters = []
         # Read the characters and their roles
-        with open("Overwatch_Heroes.json", "r") as f:
+        with open("Overwatch_Heroes.json", "r", encoding="utf-8") as f:
             for char in json.load(f):
                 characters.append(Character(char["name"], char["role"]))
-        super().__init__(characters, 5)
+                super().__init__(characters, 5)
 
     class BanList(list):
         MAX_ROLE_BANS = 2
@@ -70,13 +70,6 @@ class Overwatch(Game):
             scored_bans.append(added_and_sorted)
 
         logging.debug(scored_bans)
-
-        # This isn't quite working how I'd like it.  If one team exhausts their list of bans in their "turn"
-        # the break will stop the whole banning process.  For a small number of total bans (ie 4) this is probably fine
-        # But it's possible this could result in too few bans being created.
-        # TODO:  Make it so that if a team runs out of bans, the other team(s) can still use their bans.
-        # Maybe instead a checker condition outside of the cycle call, that will break when both teams have exhausted their options
-
 
         bans = Overwatch.BanList()
         team_ban_count = [0] * len(scored_bans)
