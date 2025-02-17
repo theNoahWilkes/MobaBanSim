@@ -5,6 +5,8 @@ import json
 import pprint
 import logging
 
+# testing branch protection
+
 logging.basicConfig(level=logging.DEBUG)
 
 def add_em_up(team_ban_votes: list):
@@ -59,7 +61,6 @@ class Overwatch(Game):
         Banning continues until each team has banned 2 characters, or until there are no more valid nominees
         :return:
         """
-
 
         # Select and tally the votes
         scored_bans = []
