@@ -1,6 +1,7 @@
 """ Ban Sim
     A simple module to simulate the banning phase of a MOBA game.
 """
+import random
 
 class Game:
     def __init__(self, characters: list, team_size, num_teams = 2):

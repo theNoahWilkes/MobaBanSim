@@ -1,8 +1,11 @@
 from itertools import cycle
+from ban_sim import *
 
-import random
 import json
 import pprint
+import logging
+
+logging.basicConfig(level=logging.DEBUG)
 
 def add_em_up(team_ban_votes: list):
     vote_tally = {}
@@ -36,6 +39,7 @@ class Overwatch(Game):
         def ban(self, character: Character) -> bool:
             try:
                 assert self._role_count.get(character.role) < self.MAX_ROLE_BANS
+                assert character not in self
             except AssertionError:
                 return False
             except TypeError:
@@ -49,7 +53,15 @@ class Overwatch(Game):
         return self._teams
 
     def ban_phase(self):
-        bans = Overwatch.BanList()
+        """
+        Ask players to vote for their top 3 bans, and tally the votes
+        Taking turns, each team nominates one character to ban from the tallied votes
+        Banning continues until each team has banned 2 characters, or until there are no more valid nominees
+        :return:
+        """
+
+
+        # Select and tally the votes
         scored_bans = []
         for team in self.lobby.teams:
             team_bans = [pl.pick_bans() for pl in team]
@@ -57,7 +69,7 @@ class Overwatch(Game):
             added_and_sorted = sorted(added.items(), key=lambda x: x[1], reverse=True)
             scored_bans.append(added_and_sorted)
 
-        pprint.pprint(scored_bans)
+        logging.debug(scored_bans)
 
         # This isn't quite working how I'd like it.  If one team exhausts their list of bans in their "turn"
         # the break will stop the whole banning process.  For a small number of total bans (ie 4) this is probably fine
@@ -65,14 +77,27 @@ class Overwatch(Game):
         # TODO:  Make it so that if a team runs out of bans, the other team(s) can still use their bans.
         # Maybe instead a checker condition outside of the cycle call, that will break when both teams have exhausted their options
 
-        for t in cycle(scored_bans):
-            b, s = t.pop(0)
-            print("Testing candidate {} with {} votes from team {}".format(b, s, t))
+
+        bans = Overwatch.BanList()
+        team_ban_count = [0] * len(scored_bans)
+        for i,t in cycle(enumerate(scored_bans)):
+            # Check if done banning, if yes break
+            if len(set().union(*scored_bans)) == 0:
+                break
+
+            # if not, keep going
             try:
+                b, s = t.pop(0)
                 while bans.ban(b) == False:  # this need a try/except
+                    logging.info("Candidate {} failed to be banned".format(b))
                     b, s = t.pop(0)
+                team_ban_count[i] += 1
+                logging.info("Team {} banned {} with {} votes".format(i +1, b, s))
             except IndexError:
                 continue
+            if team_ban_count[i] >= 2:
+                t.clear()
+
         return bans
 
 
@@ -81,7 +106,9 @@ def __main__():
     game = Overwatch()
 
     # Create a lobby and initiate the ban phase
-    print(game.ban_phase())
+    final_bans = game.ban_phase()
+    logging.debug(final_bans)
+    print("Done!")
 
 
 if __name__ == "__main__":
