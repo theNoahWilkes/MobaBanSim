@@ -5,8 +5,6 @@ import json
 import pprint
 import logging
 
-# testing branch protection
-
 logging.basicConfig(level=logging.DEBUG)
 
 def add_em_up(team_ban_votes: list):
