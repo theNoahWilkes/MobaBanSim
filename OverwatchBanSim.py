@@ -68,6 +68,8 @@ class Overwatch(Game):
             added_and_sorted = sorted(added.items(), key=lambda x: x[1], reverse=True)
             scored_bans.append(added_and_sorted)
 
+        scored_bans.sort(key=lambda team: team[0][1], reverse=True)
+
         logging.debug(scored_bans)
 
         bans = Overwatch.BanList()
