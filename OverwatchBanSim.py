@@ -10,14 +10,14 @@ logging.basicConfig(level=logging.DEBUG)
 def add_em_up(team_ban_votes: list):
     vote_tally = {}
     for player_vote in team_ban_votes:
-        score = 1
+        score = 3
         player_vote.reverse()
         for v in player_vote:  # I don't understand why this is saying NoneType isn't iterable...
             if v in vote_tally:
                 vote_tally[v] += score
             else:
                 vote_tally[v] = score
-            score += 1
+            score += 2
     return vote_tally
 
 
