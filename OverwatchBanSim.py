@@ -1,4 +1,4 @@
-from itertools import cycle
+from itertools import cycle, chain
 from ban_sim import *
 
 import json
@@ -20,6 +20,16 @@ def add_em_up(team_ban_votes: list):
             score += 2
     return vote_tally
 
+
+def snake_cycle(iterable) -> iter :
+    """
+    Cycle through an iterable, but in reverse every other time
+    :param iterable: The iterable to cycle through
+    :return: A generator that cycles through the iterable
+    """
+    r = reversed(iterable)
+    for i in cycle(chain(iterable, r)):
+        yield i
 
 class Overwatch(Game):
     def __init__(self):
@@ -74,7 +84,8 @@ class Overwatch(Game):
 
         bans = Overwatch.BanList()
         team_ban_count = [0] * len(scored_bans)
-        for i,t in cycle(enumerate(scored_bans)):
+        for i,t in snake_cycle(list(enumerate(scored_bans))):
+            i = i % 2
             # Check if done banning, if yes break
             if len(set().union(*scored_bans)) == 0:
                 break
